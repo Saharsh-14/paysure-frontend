@@ -1,45 +1,46 @@
 "use client";
 
-import {
-  Milestone,
-  Shield,
-  LayoutDashboard,
-  Activity,
-  Gavel,
-  Settings,
-} from "lucide-react";
+import { Milestone, Shield, LayoutDashboard, Activity, Gavel, Settings } from "lucide-react";
 import PageLayout from "@/components/landing/page-layout";
+import { motion } from "framer-motion";
 
 export default function FeaturesPage() {
-  return (
-    <PageLayout>
-      <section className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-6 lg:px-12">
-          <div className="text-center mb-16">
-            <h1 className="text-[36px] md:text-[48px] font-extrabold tracking-tight mb-4">Platform Features</h1>
-            <p className="text-gray-500 text-[16px] max-w-xl mx-auto">Everything you need to manage secure payments between freelancers and clients.</p>
-          </div>
+    return (
+        <PageLayout>
+            <section className="py-24 bg-white">
+                <div className="max-w-6xl mx-auto px-6 lg:px-12">
+                    <div className="text-center mb-16">
+                        <h1 className="text-[36px] md:text-[48px] font-extrabold tracking-tight mb-4">Platform Features</h1>
+                        <p className="text-gray-500 text-base max-w-xl mx-auto">Everything you need to manage secure payments between freelancers and clients.</p>
+                    </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { icon: <Milestone className="w-6 h-6" />, title: "Milestone-Based Payments", desc: "Break projects into milestones and release payments only after approval. Each milestone has a defined scope and amount.", color: "from-blue-500 to-blue-600" },
-              { icon: <Shield className="w-6 h-6" />, title: "Secure Escrow Wallet", desc: "Funds remain safely locked until the work is verified and approved. No unauthorized withdrawals.", color: "from-cyan-500 to-teal-500" },
-              { icon: <LayoutDashboard className="w-6 h-6" />, title: "Role-Based Dashboards", desc: "Separate dashboards for clients, freelancers, and admins. Each role sees exactly what they need.", color: "from-violet-500 to-purple-500" },
-              { icon: <Activity className="w-6 h-6" />, title: "Real-Time Transaction Tracking", desc: "Track every payment movement with full transparency. See deposits, releases, and refunds in real-time.", color: "from-emerald-500 to-green-500" },
-              { icon: <Gavel className="w-6 h-6" />, title: "Dispute Resolution System", desc: "Raise disputes when issues arise and let admins mediate fairly. All evidence is documented and tracked.", color: "from-rose-500 to-pink-500" },
-              { icon: <Settings className="w-6 h-6" />, title: "Project Management", desc: "Manage projects, milestones, approvals, and payments in one place. Streamlined workflow for everyone.", color: "from-amber-500 to-orange-500" },
-            ].map((feature) => (
-              <div key={feature.title} className="group bg-white rounded-2xl border border-gray-100 p-8 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-1">
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white shadow-md mb-6`}>
-                  {feature.icon}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[
+                            { icon: Milestone, title: "Milestone-Based Payments", desc: "Break projects into milestones and release payments only after approval.", color: "bg-blue-500/10 text-blue-600" },
+                            { icon: Shield, title: "Secure Escrow Wallet", desc: "Funds remain safely locked until work is verified and approved.", color: "bg-emerald-500/10 text-emerald-600" },
+                            { icon: LayoutDashboard, title: "Role-Based Dashboards", desc: "Separate dashboards for clients, freelancers, and admins.", color: "bg-violet-500/10 text-violet-600" },
+                            { icon: Activity, title: "Real-Time Tracking", desc: "Track every payment with full transparency in real time.", color: "bg-amber-500/10 text-amber-600" },
+                            { icon: Gavel, title: "Dispute Resolution", desc: "Admin-mediated disputes with evidence documentation.", color: "bg-rose-500/10 text-rose-600" },
+                            { icon: Settings, title: "Project Management", desc: "Manage projects, milestones, approvals, and payments in one place.", color: "bg-cyan-500/10 text-cyan-600" },
+                        ].map((feature, i) => (
+                            <motion.div
+                                key={feature.title}
+                                initial={{ opacity: 0, y: 16 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.4, delay: i * 0.05 }}
+                                className="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-lg hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1"
+                            >
+                                <div className={`w-12 h-12 rounded-xl ${feature.color} flex items-center justify-center mb-5`}>
+                                    <feature.icon className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-base font-bold mb-2">{feature.title}</h3>
+                                <p className="text-gray-500 text-sm leading-relaxed">{feature.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
-                <h3 className="text-[18px] font-bold mb-3">{feature.title}</h3>
-                <p className="text-gray-500 text-[14px] leading-relaxed">{feature.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </PageLayout>
-  );
+            </section>
+        </PageLayout>
+    );
 }

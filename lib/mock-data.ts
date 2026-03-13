@@ -1,0 +1,116 @@
+/* ─── Mock Data for PaySure MVP ─────────────────────────────── */
+/* 10 items per entity to make the frontend feel like a real product */
+
+export interface Project {
+    id: string;
+    name: string;
+    client: string;
+    freelancer: string;
+    totalEscrow: number;
+    releasedAmount: number;
+    status: "active" | "completed" | "disputed" | "pending";
+    milestones: number;
+    completedMilestones: number;
+    createdAt: string;
+}
+
+export interface MilestoneItem {
+    id: string;
+    projectId: string;
+    projectName: string;
+    title: string;
+    amount: number;
+    status: "pending" | "in_progress" | "submitted" | "approved" | "paid" | "disputed";
+    dueDate: string;
+    description: string;
+}
+
+export interface Transaction {
+    id: string;
+    type: "deposit" | "release" | "refund" | "withdrawal" | "escrow_lock";
+    description: string;
+    amount: number;
+    status: "completed" | "pending" | "failed";
+    date: string;
+    projectName?: string;
+}
+
+export interface Dispute {
+    id: string;
+    projectId: string;
+    projectName: string;
+    milestoneName: string;
+    raisedBy: string;
+    reason: string;
+    status: "open" | "under_review" | "resolved" | "escalated";
+    createdAt: string;
+    evidence: number;
+}
+
+export interface WalletData {
+    totalBalance: number;
+    escrowLocked: number;
+    availableBalance: number;
+    totalEarnings: number;
+    pendingRelease: number;
+}
+
+// ─── Projects ─────────────────────────────────────────────────
+export const MOCK_PROJECTS: Project[] = [
+    { id: "p1", name: "E-commerce Platform Redesign", client: "TechVibe Inc.", freelancer: "Sarah Chen", totalEscrow: 8500, releasedAmount: 3400, status: "active", milestones: 5, completedMilestones: 2, createdAt: "2026-01-15" },
+    { id: "p2", name: "Mobile App MVP", client: "StartupFlow", freelancer: "Alex Rivera", totalEscrow: 12000, releasedAmount: 4000, status: "active", milestones: 6, completedMilestones: 2, createdAt: "2026-02-01" },
+    { id: "p3", name: "Brand Identity Package", client: "UrbanCraft Co.", freelancer: "Maya Patel", totalEscrow: 3200, releasedAmount: 3200, status: "completed", milestones: 3, completedMilestones: 3, createdAt: "2025-11-20" },
+    { id: "p4", name: "API Integration Suite", client: "DataSync Ltd.", freelancer: "James Kim", totalEscrow: 6800, releasedAmount: 0, status: "pending", milestones: 4, completedMilestones: 0, createdAt: "2026-03-01" },
+    { id: "p5", name: "WordPress Migration", client: "GreenLeaf Media", freelancer: "Priya Sharma", totalEscrow: 2400, releasedAmount: 1200, status: "active", milestones: 3, completedMilestones: 1, createdAt: "2026-02-15" },
+    { id: "p6", name: "SaaS Dashboard", client: "CloudMetrics", freelancer: "David Okoye", totalEscrow: 15000, releasedAmount: 9000, status: "active", milestones: 5, completedMilestones: 3, createdAt: "2025-12-10" },
+    { id: "p7", name: "SEO Content Strategy", client: "BrightScale", freelancer: "Emma Torres", totalEscrow: 4500, releasedAmount: 4500, status: "completed", milestones: 4, completedMilestones: 4, createdAt: "2025-10-05" },
+    { id: "p8", name: "Payment Gateway Setup", client: "FinEdge Corp.", freelancer: "Ryan Nakamura", totalEscrow: 7200, releasedAmount: 0, status: "disputed", milestones: 3, completedMilestones: 1, createdAt: "2026-01-28" },
+    { id: "p9", name: "UI/UX Audit Report", client: "PixelForge", freelancer: "Lisa Wang", totalEscrow: 1800, releasedAmount: 1800, status: "completed", milestones: 2, completedMilestones: 2, createdAt: "2026-02-20" },
+    { id: "p10", name: "DevOps Pipeline Setup", client: "InfraNode", freelancer: "Carlos Mendez", totalEscrow: 5500, releasedAmount: 2750, status: "active", milestones: 4, completedMilestones: 2, createdAt: "2026-02-05" },
+];
+
+// ─── Milestones ───────────────────────────────────────────────
+export const MOCK_MILESTONES: MilestoneItem[] = [
+    { id: "m1", projectId: "p1", projectName: "E-commerce Platform Redesign", title: "Wireframes & Prototyping", amount: 1700, status: "paid", dueDate: "2026-02-01", description: "Complete wireframes and interactive prototypes for all pages" },
+    { id: "m2", projectId: "p1", projectName: "E-commerce Platform Redesign", title: "Frontend Development", amount: 1700, status: "paid", dueDate: "2026-02-20", description: "Implement responsive frontend with React" },
+    { id: "m3", projectId: "p1", projectName: "E-commerce Platform Redesign", title: "Backend Integration", amount: 1700, status: "in_progress", dueDate: "2026-03-15", description: "Connect frontend to backend APIs and database" },
+    { id: "m4", projectId: "p2", projectName: "Mobile App MVP", title: "App Architecture", amount: 2000, status: "paid", dueDate: "2026-02-15", description: "System design and architecture documentation" },
+    { id: "m5", projectId: "p2", projectName: "Mobile App MVP", title: "Core Feature Development", amount: 2000, status: "paid", dueDate: "2026-03-01", description: "Implement core app features and user flows" },
+    { id: "m6", projectId: "p2", projectName: "Mobile App MVP", title: "UI Polish & Animations", amount: 2000, status: "submitted", dueDate: "2026-03-15", description: "Polish UI, add animations and micro-interactions" },
+    { id: "m7", projectId: "p6", projectName: "SaaS Dashboard", title: "Dashboard Analytics", amount: 3000, status: "approved", dueDate: "2026-03-10", description: "Build analytics dashboard with charts and metrics" },
+    { id: "m8", projectId: "p5", projectName: "WordPress Migration", title: "Content Migration", amount: 1200, status: "in_progress", dueDate: "2026-03-20", description: "Migrate all content from old site to new WordPress" },
+    { id: "m9", projectId: "p8", projectName: "Payment Gateway Setup", title: "Stripe Integration", amount: 3600, status: "disputed", dueDate: "2026-02-28", description: "Integrate Stripe payment processing" },
+    { id: "m10", projectId: "p10", projectName: "DevOps Pipeline Setup", title: "CI/CD Pipeline", amount: 2750, status: "pending", dueDate: "2026-03-25", description: "Set up automated CI/CD pipeline with Docker" },
+];
+
+// ─── Transactions ─────────────────────────────────────────────
+export const MOCK_TRANSACTIONS: Transaction[] = [
+    { id: "t1", type: "escrow_lock", description: "Escrow deposit for E-commerce Redesign", amount: 8500, status: "completed", date: "2026-01-15", projectName: "E-commerce Platform Redesign" },
+    { id: "t2", type: "release", description: "Milestone payment: Wireframes & Prototyping", amount: 1700, status: "completed", date: "2026-02-02", projectName: "E-commerce Platform Redesign" },
+    { id: "t3", type: "release", description: "Milestone payment: Frontend Development", amount: 1700, status: "completed", date: "2026-02-21", projectName: "E-commerce Platform Redesign" },
+    { id: "t4", type: "escrow_lock", description: "Escrow deposit for Mobile App MVP", amount: 12000, status: "completed", date: "2026-02-01", projectName: "Mobile App MVP" },
+    { id: "t5", type: "release", description: "Milestone payment: App Architecture", amount: 2000, status: "completed", date: "2026-02-16", projectName: "Mobile App MVP" },
+    { id: "t6", type: "withdrawal", description: "Withdrawal to bank account", amount: 3200, status: "completed", date: "2026-02-25" },
+    { id: "t7", type: "deposit", description: "Wallet top-up via credit card", amount: 5000, status: "completed", date: "2026-03-01" },
+    { id: "t8", type: "release", description: "Milestone payment: Core Feature Dev", amount: 2000, status: "pending", date: "2026-03-02", projectName: "Mobile App MVP" },
+    { id: "t9", type: "refund", description: "Partial refund for disputed milestone", amount: 1800, status: "completed", date: "2026-03-05", projectName: "Payment Gateway Setup" },
+    { id: "t10", type: "escrow_lock", description: "Escrow deposit for DevOps Pipeline", amount: 5500, status: "completed", date: "2026-02-05", projectName: "DevOps Pipeline Setup" },
+];
+
+// ─── Disputes ─────────────────────────────────────────────────
+export const MOCK_DISPUTES: Dispute[] = [
+    { id: "d1", projectId: "p8", projectName: "Payment Gateway Setup", milestoneName: "Stripe Integration", raisedBy: "FinEdge Corp.", reason: "Milestone deliverables do not match the agreed scope. Payment gateway has critical bugs.", status: "open", createdAt: "2026-03-01", evidence: 3 },
+    { id: "d2", projectId: "p2", projectName: "Mobile App MVP", milestoneName: "UI Polish & Animations", raisedBy: "StartupFlow", reason: "Submitted work is incomplete. Several animations are missing from the specification.", status: "under_review", createdAt: "2026-03-08", evidence: 5 },
+    { id: "d3", projectId: "p1", projectName: "E-commerce Platform Redesign", milestoneName: "Backend Integration", raisedBy: "Sarah Chen", reason: "Client has not responded to approval request for 14 days.", status: "escalated", createdAt: "2026-03-10", evidence: 2 },
+    { id: "d4", projectId: "p7", projectName: "SEO Content Strategy", milestoneName: "Keyword Research Report", raisedBy: "BrightScale", reason: "Content quality below expected standard. Multiple factual errors found.", status: "resolved", createdAt: "2025-11-15", evidence: 4 },
+    { id: "d5", projectId: "p3", projectName: "Brand Identity Package", milestoneName: "Logo Design", raisedBy: "Maya Patel", reason: "Payment delay after milestone was approved 30 days ago.", status: "resolved", createdAt: "2025-12-01", evidence: 1 },
+];
+
+// ─── Wallet ───────────────────────────────────────────────────
+export const MOCK_WALLET: WalletData = {
+    totalBalance: 24650,
+    escrowLocked: 18200,
+    availableBalance: 6450,
+    totalEarnings: 42800,
+    pendingRelease: 4000,
+};

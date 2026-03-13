@@ -1,68 +1,77 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
-import { cn } from "@/lib/utils";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Bell, Search, Briefcase, Code2, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const navItems = [
-    { name: "Dashboard", href: "/dashboard" },
-    { name: "Wallet", href: "/wallet" },
-    { name: "Projects", href: "/projects" },
-    { name: "Transactions", href: "/transactions" },
-    { name: "Disputes", href: "/disputes" },
-];
+type UserRole = "client" | "freelancer" | "admin";
+
+const roleConfig: Record<UserRole, { label: string; icon: typeof Briefcase; color: string; bgColor: string }> = {
+    client: { label: "Client", icon: Briefcase, color: "text-blue-400", bgColor: "bg-blue-500/10 border-blue-500/20" },
+    freelancer: { label: "Freelancer", icon: Code2, color: "text-emerald-400", bgColor: "bg-emerald-500/10 border-emerald-500/20" },
+    admin: { label: "Admin", icon: Crown, color: "text-amber-400", bgColor: "bg-amber-500/10 border-amber-500/20" },
+};
 
 export function Navbar() {
-    const pathname = usePathname();
     const { theme, setTheme } = useTheme();
+    const { user } = useUser();
+    const role = ((user?.publicMetadata?.role as string) || "freelancer") as UserRole;
+    const config = roleConfig[role];
+    const RoleIcon = config.icon;
 
     return (
-        <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-md">
-            <div className="container mx-auto flex h-16 items-center flex-wrap px-4 md:px-8">
-                <div className="mr-8 flex items-center">
-                    <Link href="/" className="flex items-center space-x-2">
-                        <span className="text-xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
-                            PaySure
-                        </span>
-                    </Link>
+        <nav className="sticky top-0 z-30 h-16 border-b border-border bg-card/80 backdrop-blur-md flex-shrink-0">
+            <div className="flex h-full items-center justify-between px-6 lg:px-8">
+                {/* Search */}
+                <div className="hidden md:flex items-center gap-2 bg-muted rounded-xl px-3.5 py-2 w-[320px] transition-colors focus-within:ring-2 focus-within:ring-primary/20">
+                    <Search className="w-4 h-4 text-muted-foreground" />
+                    <input
+                        type="text"
+                        placeholder="Search projects, transactions..."
+                        className="bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none w-full"
+                    />
                 </div>
 
-                <div className="hidden md:flex flex-1 items-center justify-center space-x-6 text-sm font-medium">
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={cn(
-                                "transition-colors hover:text-white/80",
-                                pathname === item.href
-                                    ? "text-white bg-white/10 px-4 py-2 rounded-full"
-                                    : "text-white/60"
-                            )}
-                        >
-                            {item.name}
-                        </Link>
-                    ))}
-                </div>
+                {/* Right section */}
+                <div className="flex items-center gap-3 ml-auto">
+                    {/* Role Badge */}
+                    <div className={`hidden sm:flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 ${config.bgColor}`}>
+                        <RoleIcon className={`w-3.5 h-3.5 ${config.color}`} />
+                        <span className={`text-[11px] font-semibold ${config.color}`}>{config.label}</span>
+                    </div>
 
-                <div className="flex flex-1 items-center justify-end space-x-4">
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10"
+                        className="rounded-xl w-10 h-10 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
                     >
-                        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                        <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                        <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                        <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                         <span className="sr-only">Toggle theme</span>
                     </Button>
-                    <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-                        <UserButton afterSignOutUrl="/" appearance={{
-                            elements: { userButtonAvatarBox: "h-8 w-8 rounded-full" }
-                        }} />
+
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-xl w-10 h-10 text-muted-foreground hover:text-foreground hover:bg-muted relative transition-colors"
+                    >
+                        <Bell className="h-[18px] w-[18px]" />
+                        <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary" />
+                    </Button>
+
+                    <div className="w-px h-8 bg-border mx-1" />
+
+                    <div className="flex items-center gap-3">
+                        <UserButton
+                            afterSignOutUrl="/"
+                            appearance={{
+                                elements: {
+                                    userButtonAvatarBox: "h-9 w-9 rounded-xl",
+                                },
+                            }}
+                        />
                     </div>
                 </div>
             </div>

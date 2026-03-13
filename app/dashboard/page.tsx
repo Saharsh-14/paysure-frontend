@@ -1,6 +1,9 @@
 "use client";
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { BalanceCard } from "@/components/dashboard/balance-card";
 import { ActiveEscrowCard } from "@/components/dashboard/wallet-card";
 import { TransactionList } from "@/components/dashboard/transaction-list";
@@ -8,7 +11,6 @@ import { ProjectOverview } from "@/components/dashboard/project-overview";
 import { ActiveDisputesCard } from "@/components/dashboard/disputes-card";
 import { StatCard } from "@/components/ui/stat-card";
 import { useWalletBalance, useProjects, useMilestones } from "@/lib/hooks";
-import { useUser } from "@clerk/nextjs";
 import { Lock, Wallet, FolderKanban, Milestone, ArrowRight, Briefcase, Code2, Plus, ArrowDownToLine, AlertCircle, Users } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -18,9 +20,26 @@ function formatCurrency(amount: number) {
 }
 
 export default function DashboardPage() {
-    const { user } = useUser();
-    const role = (user?.publicMetadata?.role as string) || "Freelancer";
+    const router = useRouter();
+    const { user, isLoaded } = useUser();
+    
+    // Default to Freelancer but handle the loading state
+    const rawRole = (user?.publicMetadata?.role as string) || "Freelancer";
+    const role = rawRole.charAt(0).toUpperCase() + rawRole.slice(1).toLowerCase();
     const firstName = user?.firstName || "there";
+
+    useEffect(() => {
+        if (isLoaded && !user?.publicMetadata?.role) {
+            // User is logged in but has no role — send to landing page to pick one
+            // or to sync-user if they just picked one (localStorage)
+            const savedRole = localStorage.getItem("paysure_role");
+            if (savedRole) {
+                router.replace("/sync-user");
+            } else {
+                router.replace("/");
+            }
+        }
+    }, [isLoaded, user, router]);
 
     const { data: wallet } = useWalletBalance();
     const { data: projects } = useProjects();
@@ -30,6 +49,17 @@ export default function DashboardPage() {
     const pendingMilestones = (milestones || []).filter((m: any) =>
         m.status === "pending" || m.status === "in_progress" || m.status === "submitted"
     ).length;
+
+    if (!isLoaded) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-background">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm font-medium animate-pulse">Loading dashboard...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <DashboardLayout>

@@ -11,6 +11,17 @@ export function useApi() {
 
 /* ─── Query Hooks ─────────────────────────────────────────── */
 
+export function useUserProfile() {
+    const api = useApi();
+    return useQuery({
+        queryKey: ["user-profile"],
+        queryFn: async () => {
+            const res = await api.get("/users/me");
+            return res.data;
+        },
+    });
+}
+
 export function useProjects() {
     const api = useApi();
     return useQuery({
@@ -79,6 +90,20 @@ export function useConnections() {
     });
 }
 
+export function useUserLookup(email: string) {
+    const api = useApi();
+    return useQuery({
+        queryKey: ["user-lookup", email],
+        queryFn: async () => {
+            if (!email || !email.includes("@")) return null;
+            const res = await api.get(`/users/lookup?email=${encodeURIComponent(email)}`);
+            return res.data;
+        },
+        enabled: !!email && email.includes("@"),
+        retry: false, // Don't keep retrying if the user is typing and hits a 404
+    });
+}
+
 /* ─── Mutation Hooks ──────────────────────────────────────── */
 
 export function useCreateProject() {
@@ -86,11 +111,9 @@ export function useCreateProject() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (data: {
-            name: string;
-            client: string;
-            freelancer: string;
-            totalEscrow: number;
-            milestones: number;
+            title: string;
+            description?: string;
+            other_party_email: string;
         }) => {
             const res = await api.post("/projects", data);
             return res.data;
@@ -192,6 +215,33 @@ export function useInvitePartner() {
     return useMutation({
         mutationFn: async (email: string) => {
             const res = await api.post("/connections/invite", { email });
+            return res.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["connections"] });
+        },
+    });
+}
+export function useAcceptInvitation() {
+    const api = useApi();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (connectionId: number) => {
+            const res = await api.post(`/connections/${connectionId}/accept`);
+            return res.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["connections"] });
+        },
+    });
+}
+
+export function useRejectInvitation() {
+    const api = useApi();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (connectionId: number) => {
+            const res = await api.post(`/connections/${connectionId}/reject`);
             return res.data;
         },
         onSuccess: () => {

@@ -13,11 +13,20 @@ const isProtectedRoute = createRouteMatcher([
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
 export default clerkMiddleware((auth, req) => {
+    const { userId, sessionClaims } = auth();
+    const url = new URL(req.url);
+    const role = (sessionClaims?.metadata as any)?.role;
+
+    // If user is logged in, HAS a role, and trying to access landing page, redirect to dashboard
+    if (userId && role && url.pathname === "/") {
+        return Response.redirect(new URL("/dashboard", req.url));
+    }
+
     if (isAdminRoute(req)) {
         const role = (auth().sessionClaims?.metadata as any)?.role;
         if (role !== "Admin") {
-            const url = new URL("/", req.url);
-            return Response.redirect(url);
+            const redirectUrl = new URL("/", req.url);
+            return Response.redirect(redirectUrl);
         }
     }
     if (isProtectedRoute(req)) auth().protect();

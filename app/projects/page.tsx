@@ -1,7 +1,7 @@
 "use client";
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { useProjects, useCreateProject } from "@/lib/hooks";
+import { useProjects, useCreateProject, useUserLookup } from "@/lib/hooks";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Plus, Search, Filter } from "lucide-react";
@@ -24,19 +24,24 @@ export default function ProjectsPage() {
     const { data: projects, isLoading } = useProjects();
     const createProject = useCreateProject();
     const [showForm, setShowForm] = useState(false);
-    const [form, setForm] = useState({ name: "", client: "", freelancer: "", totalEscrow: "", milestones: "" });
+    
+    // Form state matching the backend `ProjectCreate` schema
+    const [form, setForm] = useState({ title: "", description: "", otherPartyEmail: "" });
     const [search, setSearch] = useState("");
 
+    // Look up the user by email as they type
+    const { data: lookedUpUser, isLoading: isLookingUp } = useUserLookup(form.otherPartyEmail);
+
     const handleCreate = async () => {
-        if (!form.name) return;
+        if (!form.title || !form.otherPartyEmail) return;
+        
         await createProject.mutateAsync({
-            name: form.name,
-            client: form.client,
-            freelancer: form.freelancer,
-            totalEscrow: parseFloat(form.totalEscrow) || 0,
-            milestones: parseInt(form.milestones) || 1,
+            title: form.title,
+            description: form.description || undefined,
+            other_party_email: form.otherPartyEmail,
         });
-        setForm({ name: "", client: "", freelancer: "", totalEscrow: "", milestones: "" });
+        
+        setForm({ title: "", description: "", otherPartyEmail: "" });
         setShowForm(false);
     };
 
@@ -66,11 +71,33 @@ export default function ProjectsPage() {
                 <div className="rounded-2xl border border-border bg-card p-6 mb-6 space-y-4">
                     <h3 className="text-base font-semibold text-foreground">Create New Project</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <input placeholder="Project Name *" value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} className="rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" />
-                        <input placeholder="Client Name" value={form.client} onChange={(e) => setForm({...form, client: e.target.value})} className="rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" />
-                        <input placeholder="Freelancer Name" value={form.freelancer} onChange={(e) => setForm({...form, freelancer: e.target.value})} className="rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" />
-                        <input type="number" placeholder="Escrow Amount ($)" value={form.totalEscrow} onChange={(e) => setForm({...form, totalEscrow: e.target.value})} className="rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" />
-                        <input type="number" placeholder="Number of Milestones" value={form.milestones} onChange={(e) => setForm({...form, milestones: e.target.value})} className="rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" />
+                        <input placeholder="Project Name *" value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} className="rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" />
+                        
+                        <div>
+                            <input 
+                                placeholder="Other Party Email *" 
+                                type="email"
+                                value={form.otherPartyEmail} 
+                                onChange={(e) => setForm({...form, otherPartyEmail: e.target.value})} 
+                                className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" 
+                            />
+                            {/* User Lookup Result */}
+                            {form.otherPartyEmail.includes("@") && (
+                                <div className="mt-2 text-sm px-2">
+                                    {isLookingUp ? (
+                                        <span className="text-muted-foreground animate-pulse">Looking up user...</span>
+                                    ) : lookedUpUser ? (
+                                        <span className="text-emerald-500 font-medium">
+                                            ✓ Found {lookedUpUser.role}: {lookedUpUser.full_name || lookedUpUser.email}
+                                        </span>
+                                    ) : (
+                                        <span className="text-destructive">User not found on PaySure</span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        <input placeholder="Project Description (Optional)" value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} className="md:col-span-2 rounded-xl bg-muted border border-border px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" />
                     </div>
                     <div className="flex gap-3">
                         <Button className="rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold h-10 px-6 text-sm" onClick={handleCreate} disabled={createProject.isPending}>

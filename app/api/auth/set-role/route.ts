@@ -12,7 +12,8 @@ export async function POST(req: Request) {
         const { role } = body;
 
         if (role) {
-            await clerkClient().users.updateUserMetadata(userId, {
+            const client = await clerkClient();
+            await client.users.updateUserMetadata(userId, {
                 publicMetadata: { role }
             });
         }

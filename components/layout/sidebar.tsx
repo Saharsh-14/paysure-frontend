@@ -24,11 +24,13 @@ import { useState, useEffect } from "react";
 type UserRole = "Client" | "Freelancer" | "Admin";
 
 function useRole(): UserRole {
-    const { user } = useUser();
+    const { user, isLoaded } = useUser();
+    if (!isLoaded) return "Freelancer"; // Fallback during load
+
     const rawRole = (user?.publicMetadata?.role as string) || "Freelancer";
     // Standardize to Capitalized (Client/Freelancer/Admin)
     const role = (rawRole.charAt(0).toUpperCase() + rawRole.slice(1).toLowerCase()) as UserRole;
-    return role;
+    return role === "Admin" || role === "Client" || role === "Freelancer" ? role : "Freelancer";
 }
 
 const roleConfig: Record<UserRole, { label: string; icon: React.ElementType; color: string; bgColor: string }> = {

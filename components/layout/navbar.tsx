@@ -15,10 +15,10 @@ const roleConfig: Record<UserRole, { label: string; icon: typeof Briefcase; colo
 
 export function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
     const { theme, setTheme } = useTheme();
-    const { user } = useUser();
+    const { user, isLoaded } = useUser();
     const rawRole = (user?.publicMetadata?.role as string) || "Freelancer";
     const role = (rawRole.charAt(0).toUpperCase() + rawRole.slice(1).toLowerCase()) as UserRole;
-    const config = roleConfig[role];
+    const config = roleConfig[role] || roleConfig.Freelancer;
     const RoleIcon = config.icon;
 
     return (

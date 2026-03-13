@@ -9,7 +9,7 @@ import { ActiveDisputesCard } from "@/components/dashboard/disputes-card";
 import { StatCard } from "@/components/ui/stat-card";
 import { useWalletBalance, useProjects, useMilestones } from "@/lib/hooks";
 import { useUser } from "@clerk/nextjs";
-import { Lock, Wallet, FolderKanban, Milestone, ArrowRight, Briefcase, Code2, Plus, ArrowDownToLine, AlertCircle } from "lucide-react";
+import { Lock, Wallet, FolderKanban, Milestone, ArrowRight, Briefcase, Code2, Plus, ArrowDownToLine, AlertCircle, Users } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -19,7 +19,7 @@ function formatCurrency(amount: number) {
 
 export default function DashboardPage() {
     const { user } = useUser();
-    const role = (user?.publicMetadata?.role as string) || "freelancer";
+    const role = (user?.publicMetadata?.role as string) || "Freelancer";
     const firstName = user?.firstName || "there";
 
     const { data: wallet } = useWalletBalance();
@@ -37,9 +37,9 @@ export default function DashboardPage() {
             <div className="mb-6">
                 <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                        role === "client" ? "bg-blue-500/10" : "bg-emerald-500/10"
+                        role === "Client" ? "bg-blue-500/10" : "bg-emerald-500/10"
                     }`}>
-                        {role === "client" ? (
+                        {role === "Client" ? (
                             <Briefcase className="w-5 h-5 text-blue-500" />
                         ) : (
                             <Code2 className="w-5 h-5 text-emerald-500" />
@@ -50,7 +50,7 @@ export default function DashboardPage() {
                             Welcome back, {firstName}
                         </h1>
                         <p className="text-sm text-muted-foreground mt-0.5">
-                            {role === "client"
+                            {role === "Client"
                                 ? "Manage your projects and escrow payments"
                                 : "Track your milestones and earnings"}
                         </p>
@@ -60,7 +60,7 @@ export default function DashboardPage() {
 
             {/* Role-specific stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                {role === "client" ? (
+                {role === "Client" ? (
                     // CLIENT stats — focuses on spending, escrow, projects
                     <>
                         <StatCard
@@ -134,7 +134,7 @@ export default function DashboardPage() {
 
             {/* Quick Actions — role-specific */}
             <div className="flex flex-wrap gap-3 mb-6">
-                {role === "client" ? (
+                {role === "Client" ? (
                     <>
                         <Link href="/projects">
                             <Button className="rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold h-10 px-5 text-sm shadow-md shadow-primary/20">
@@ -144,6 +144,11 @@ export default function DashboardPage() {
                         <Link href="/wallet">
                             <Button variant="outline" className="rounded-xl border-border text-foreground hover:bg-muted font-semibold h-10 px-5 text-sm">
                                 <ArrowDownToLine className="w-4 h-4 mr-2" /> Fund Escrow
+                            </Button>
+                        </Link>
+                        <Link href="/partners">
+                            <Button variant="outline" className="rounded-xl border-border text-foreground hover:bg-muted font-semibold h-10 px-5 text-sm">
+                                <Users className="w-4 h-4 mr-2" /> My Partners
                             </Button>
                         </Link>
                     </>
@@ -159,13 +164,18 @@ export default function DashboardPage() {
                                 <AlertCircle className="w-4 h-4 mr-2" /> Raise Dispute
                             </Button>
                         </Link>
+                        <Link href="/partners">
+                            <Button variant="outline" className="rounded-xl border-border text-foreground hover:bg-muted font-semibold h-10 px-5 text-sm">
+                                <Users className="w-4 h-4 mr-2" /> My Partners
+                            </Button>
+                        </Link>
                     </>
                 )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 {/* Left Column */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="xl:col-span-2 space-y-6">
                     <BalanceCard />
 
                     {/* Recent Transactions */}
@@ -183,7 +193,7 @@ export default function DashboardPage() {
                     <div>
                         <div className="flex items-center justify-between mb-3">
                             <h2 className="text-base font-semibold text-foreground">
-                                {role === "client" ? "Your Projects" : "Assigned Projects"}
+                                {role === "Client" ? "Your Projects" : "Assigned Projects"}
                             </h2>
                             <Link href="/projects" className="text-xs font-medium text-primary hover:underline flex items-center gap-1">
                                 View All <ArrowRight className="w-3 h-3" />
@@ -194,7 +204,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Right Column */}
-                <div className="space-y-6 lg:sticky lg:top-24 h-max">
+                <div className="space-y-6 xl:sticky xl:top-24 h-max">
                     <ActiveEscrowCard />
                     <ActiveDisputesCard />
                 </div>

@@ -2,26 +2,11 @@
 
 import { useAuth } from "@clerk/nextjs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "./api";
-import { useMemo } from "react";
+import api from "./api";
 
 /* ─── Authenticated API Instance ──────────────────────────── */
 export function useApi() {
-    const { getToken } = useAuth();
-
-    const authenticatedApi = useMemo(() => {
-        const instance = api;
-        instance.interceptors.request.use(async (config) => {
-            const token = await getToken();
-            if (token && config.headers) {
-                config.headers.Authorization = `Bearer ${token}`;
-            }
-            return config;
-        });
-        return instance;
-    }, [getToken]);
-
-    return authenticatedApi;
+    return api;
 }
 
 /* ─── Query Hooks ─────────────────────────────────────────── */
@@ -31,9 +16,10 @@ export function useProjects() {
     return useQuery({
         queryKey: ["projects"],
         queryFn: async () => {
-            const res = await api.get("/projects");
+            const res = await api.get("/projects/my");
             return res.data;
         },
+        refetchInterval: 5000, 
     });
 }
 
@@ -45,6 +31,7 @@ export function useMilestones() {
             const res = await api.get("/milestones");
             return res.data;
         },
+        refetchInterval: 5000,
     });
 }
 
@@ -76,6 +63,17 @@ export function useWalletBalance() {
         queryKey: ["wallet-balance"],
         queryFn: async () => {
             const res = await api.get("/wallet/balance");
+            return res.data;
+        },
+    });
+}
+
+export function useConnections() {
+    const api = useApi();
+    return useQuery({
+        queryKey: ["connections"],
+        queryFn: async () => {
+            const res = await api.get("/connections/my");
             return res.data;
         },
     });
@@ -156,12 +154,27 @@ export function useRaiseDispute() {
     });
 }
 
-export function useUpdateMilestone() {
+export function useSubmitMilestone() {
     const api = useApi();
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, ...data }: { id: string; status?: string }) => {
-            const res = await api.put(`/milestones/${id}`, data);
+        mutationFn: async (milestoneId: number) => {
+            const res = await api.put(`/milestones/${milestoneId}/complete`);
+            return res.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["milestones"] });
+            queryClient.invalidateQueries({ queryKey: ["projects"] });
+        },
+    });
+}
+
+export function useApproveMilestone() {
+    const api = useApi();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (milestoneId: number) => {
+            const res = await api.put(`/milestones/${milestoneId}/approve`);
             return res.data;
         },
         onSuccess: () => {
@@ -169,6 +182,20 @@ export function useUpdateMilestone() {
             queryClient.invalidateQueries({ queryKey: ["projects"] });
             queryClient.invalidateQueries({ queryKey: ["wallet-balance"] });
             queryClient.invalidateQueries({ queryKey: ["transactions"] });
+        },
+    });
+}
+
+export function useInvitePartner() {
+    const api = useApi();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (email: string) => {
+            const res = await api.post("/connections/invite", { email });
+            return res.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["connections"] });
         },
     });
 }

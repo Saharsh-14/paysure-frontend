@@ -34,7 +34,7 @@ export default function LandingPage() {
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
 
-    const handleRoleSignup = (role: "client" | "freelancer") => {
+    const handleRoleSignup = (role: "Client" | "Freelancer") => {
         localStorage.setItem("paysure_role", role);
         router.push("/signup");
     };
@@ -87,14 +87,14 @@ export default function LandingPage() {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-[180px] p-2 rounded-xl border-gray-100 shadow-xl">
-                                    <DropdownMenuItem onClick={() => handleRoleSignup("client")} className="flex items-center gap-2.5 py-2.5 px-3 cursor-pointer rounded-lg">
+                                    <DropdownMenuItem onClick={() => handleRoleSignup("Client")} className="flex items-center gap-2.5 py-2.5 px-3 cursor-pointer rounded-lg">
                                         <Briefcase className="w-4 h-4 text-gray-400" />
                                         <div className="flex flex-col">
                                             <span className="text-[13px] font-bold">I want to Hire</span>
                                             <span className="text-[10px] text-gray-400 font-medium">Post projects</span>
                                         </div>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleRoleSignup("freelancer")} className="flex items-center gap-2.5 py-2.5 px-3 cursor-pointer rounded-lg mt-1">
+                                    <DropdownMenuItem onClick={() => handleRoleSignup("Freelancer")} className="flex items-center gap-2.5 py-2.5 px-3 cursor-pointer rounded-lg mt-1">
                                         <UserPlus className="w-4 h-4 text-gray-400" />
                                         <div className="flex flex-col">
                                             <span className="text-[13px] font-bold">I want to Work</span>
@@ -147,13 +147,13 @@ export default function LandingPage() {
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Button
-                                onClick={() => handleRoleSignup("client")}
+                                onClick={() => handleRoleSignup("Client")}
                                 className="w-full sm:w-auto rounded-full bg-primary hover:bg-primary/90 text-white border-0 shadow-lg shadow-primary/30 h-[52px] px-8 text-[15px] font-bold gap-2.5 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5"
                             >
                                 Hire Top Talent <Briefcase className="w-5 h-5 opacity-90" />
                             </Button>
                             <Button
-                                onClick={() => handleRoleSignup("freelancer")}
+                                onClick={() => handleRoleSignup("Freelancer")}
                                 className="w-full sm:w-auto rounded-full bg-white text-gray-900 border-2 border-gray-200 hover:border-primary hover:bg-gray-50 shadow-sm h-[52px] px-8 text-[15px] font-bold gap-2.5 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
                             >
                                 Work & Get Paid <UserPlus className="w-5 h-5 text-primary" />
@@ -276,13 +276,13 @@ export default function LandingPage() {
                     <p className="text-gray-400 text-base mb-10 max-w-md mx-auto">Join freelancers and businesses already using PaySure for trusted milestone-based payments.</p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Button
-                            onClick={() => handleRoleSignup("client")}
+                            onClick={() => handleRoleSignup("Client")}
                             className="w-full sm:w-auto rounded-full bg-primary hover:bg-primary/90 text-white border-0 shadow-lg shadow-primary/30 h-[52px] px-8 text-[15px] font-bold gap-2.5 transition-all"
                         >
                             Hire Top Talent <Briefcase className="w-5 h-5" />
                         </Button>
                         <Button
-                            onClick={() => handleRoleSignup("freelancer")}
+                            onClick={() => handleRoleSignup("Freelancer")}
                             className="w-full sm:w-auto rounded-full bg-white/10 text-white border border-white/20 hover:bg-white/20 h-[52px] px-8 text-[15px] font-bold gap-2.5 transition-all"
                         >
                             Work & Get Paid <UserPlus className="w-5 h-5" />

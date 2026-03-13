@@ -2,27 +2,38 @@
 
 import { UserButton, useUser } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
-import { Moon, Sun, Bell, Search, Briefcase, Code2, Crown } from "lucide-react";
+import { Moon, Sun, Bell, Search, Briefcase, Code2, Crown, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type UserRole = "client" | "freelancer" | "admin";
+type UserRole = "Client" | "Freelancer" | "Admin";
 
 const roleConfig: Record<UserRole, { label: string; icon: typeof Briefcase; color: string; bgColor: string }> = {
-    client: { label: "Client", icon: Briefcase, color: "text-blue-400", bgColor: "bg-blue-500/10 border-blue-500/20" },
-    freelancer: { label: "Freelancer", icon: Code2, color: "text-emerald-400", bgColor: "bg-emerald-500/10 border-emerald-500/20" },
-    admin: { label: "Admin", icon: Crown, color: "text-amber-400", bgColor: "bg-amber-500/10 border-amber-500/20" },
+    Client: { label: "Client", icon: Briefcase, color: "text-blue-400", bgColor: "bg-blue-500/10 border-blue-500/20" },
+    Freelancer: { label: "Freelancer", icon: Code2, color: "text-emerald-400", bgColor: "bg-emerald-500/10 border-emerald-500/20" },
+    Admin: { label: "Admin", icon: Crown, color: "text-amber-400", bgColor: "bg-amber-500/10 border-amber-500/20" },
 };
 
-export function Navbar() {
+export function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
     const { theme, setTheme } = useTheme();
     const { user } = useUser();
-    const role = ((user?.publicMetadata?.role as string) || "freelancer") as UserRole;
+    const rawRole = (user?.publicMetadata?.role as string) || "Freelancer";
+    const role = (rawRole.charAt(0).toUpperCase() + rawRole.slice(1).toLowerCase()) as UserRole;
     const config = roleConfig[role];
     const RoleIcon = config.icon;
 
     return (
         <nav className="sticky top-0 z-30 h-16 border-b border-border bg-card/80 backdrop-blur-md flex-shrink-0">
-            <div className="flex h-full items-center justify-between px-6 lg:px-8">
+            <div className="flex h-full items-center justify-between px-4 md:px-6 lg:px-8 gap-4">
+                {/* Mobile Menu Button */}
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="lg:hidden rounded-xl h-10 w-10 flex-shrink-0"
+                    onClick={onMenuClick}
+                >
+                    <Menu className="h-5 w-5" />
+                </Button>
+
                 {/* Search */}
                 <div className="hidden md:flex items-center gap-2 bg-muted rounded-xl px-3.5 py-2 w-[320px] transition-colors focus-within:ring-2 focus-within:ring-primary/20">
                     <Search className="w-4 h-4 text-muted-foreground" />

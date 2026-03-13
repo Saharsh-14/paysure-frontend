@@ -17,21 +17,24 @@ import {
     Briefcase,
     Code2,
     Crown,
+    Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-type UserRole = "client" | "freelancer" | "admin";
+type UserRole = "Client" | "Freelancer" | "Admin";
 
 function useRole(): UserRole {
     const { user } = useUser();
-    const role = (user?.publicMetadata?.role as string) || "freelancer";
-    return role as UserRole;
+    const rawRole = (user?.publicMetadata?.role as string) || "Freelancer";
+    // Standardize to Capitalized (Client/Freelancer/Admin)
+    const role = (rawRole.charAt(0).toUpperCase() + rawRole.slice(1).toLowerCase()) as UserRole;
+    return role;
 }
 
 const roleConfig: Record<UserRole, { label: string; icon: React.ElementType; color: string; bgColor: string }> = {
-    client: { label: "Client", icon: Briefcase, color: "text-blue-400", bgColor: "bg-blue-500/10 border-blue-500/20" },
-    freelancer: { label: "Freelancer", icon: Code2, color: "text-emerald-400", bgColor: "bg-emerald-500/10 border-emerald-500/20" },
-    admin: { label: "Admin", icon: Crown, color: "text-amber-400", bgColor: "bg-amber-500/10 border-amber-500/20" },
+    Client: { label: "Client", icon: Briefcase, color: "text-blue-400", bgColor: "bg-blue-500/10 border-blue-500/20" },
+    Freelancer: { label: "Freelancer", icon: Code2, color: "text-emerald-400", bgColor: "bg-emerald-500/10 border-emerald-500/20" },
+    Admin: { label: "Admin", icon: Crown, color: "text-amber-400", bgColor: "bg-amber-500/10 border-amber-500/20" },
 };
 
 function getNavGroups(role: UserRole) {
@@ -40,11 +43,12 @@ function getNavGroups(role: UserRole) {
             label: "Overview",
             items: [
                 { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+                { name: "My Partners", href: "/partners", icon: Users },
             ],
         },
     ];
 
-    if (role === "client") {
+    if (role === "Client") {
         // Client: focuses on posting projects and managing escrow
         groups.push({
             label: "Projects",
@@ -76,7 +80,7 @@ function getNavGroups(role: UserRole) {
     const supportItems: { name: string; href: string; icon: typeof LayoutDashboard }[] = [
         { name: "Disputes", href: "/disputes", icon: Scale },
     ];
-    if (role === "admin") {
+    if (role === "Admin") {
         supportItems.push({ name: "Admin Panel", href: "/admin", icon: ShieldCheck });
     }
     groups.push({ label: "Support", items: supportItems });
@@ -84,7 +88,7 @@ function getNavGroups(role: UserRole) {
     return groups;
 }
 
-export function Sidebar() {
+export function Sidebar({ isOpen, setIsOpen }: { isOpen?: boolean; setIsOpen?: (open: boolean) => void }) {
     const pathname = usePathname();
     const [collapsed, setCollapsed] = useState(false);
     const role = useRole();
@@ -92,13 +96,29 @@ export function Sidebar() {
     const config = roleConfig[role];
     const RoleIcon = config.icon;
 
+    // Close mobile sidebar on route change
+    useEffect(() => {
+        if (setIsOpen) setIsOpen(false);
+    }, [pathname, setIsOpen]);
+
     return (
-        <aside
-            className={cn(
-                "sticky top-0 h-screen flex flex-col border-r border-sidebar-border bg-sidebar-bg transition-all duration-300 z-40",
-                collapsed ? "w-[68px]" : "w-[240px]"
-            )}
-        >
+        <>
+            {/* Mobile Overlay */}
+            <div 
+                className={cn(
+                    "fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 lg:hidden",
+                    isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                )}
+                onClick={() => setIsOpen?.(false)}
+            />
+
+            <aside
+                className={cn(
+                    "fixed inset-y-0 left-0 z-50 lg:sticky lg:flex flex-col border-r border-sidebar-border bg-sidebar-bg transition-all duration-300",
+                    collapsed ? "w-[68px]" : "w-[240px]",
+                    isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+                )}
+            >
             {/* Logo */}
             <div className="flex items-center h-16 px-4 border-b border-sidebar-border flex-shrink-0">
                 <Link href="/" className="flex items-center gap-2.5 overflow-hidden">
@@ -167,8 +187,8 @@ export function Sidebar() {
                 ))}
             </nav>
 
-            {/* Collapse button */}
-            <div className="border-t border-sidebar-border p-3 flex-shrink-0">
+            {/* Collapse button - Hidden on mobile */}
+            <div className="border-t border-sidebar-border p-3 flex-shrink-0 hidden lg:block">
                 <button
                     onClick={() => setCollapsed(!collapsed)}
                     className="w-full flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm text-muted-foreground hover:bg-sidebar-hover hover:text-foreground transition-colors"
@@ -184,5 +204,6 @@ export function Sidebar() {
                 </button>
             </div>
         </aside>
+    </>
     );
 }

@@ -14,14 +14,22 @@ export default function SyncUser() {
             const role = localStorage.getItem("paysure_role");
 
             if (role) {
+                console.log("Syncing role from localStorage:", role);
+                // Standardize to Capitalized (Client/Freelancer)
+                const standardizedRole = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+                
                 // New signup or role change — push role to Clerk metadata
                 try {
-                    await fetch("/api/auth/set-role", {
+                    const res = await fetch("/api/auth/set-role", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ role }),
+                        body: JSON.stringify({ role: standardizedRole }),
                     });
-                    localStorage.removeItem("paysure_role");
+                    
+                    if (res.ok) {
+                        console.log("Role synced successfully:", standardizedRole);
+                        localStorage.removeItem("paysure_role");
+                    }
                 } catch (e) {
                     console.error("Failed to sync role", e);
                 }

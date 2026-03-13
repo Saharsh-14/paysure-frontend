@@ -16,8 +16,14 @@ export default function RootLayout({
     return (
         <ClerkProvider>
             <html lang="en" suppressHydrationWarning>
-                <body>
-                    <Providers>{children}</Providers>
+                <body className="antialiased bg-background text-foreground">
+                    <Providers>
+                        <div className="min-h-screen flex flex-col">
+                            <div className="flex-1 w-full">
+                                {children}
+                            </div>
+                        </div>
+                    </Providers>
                 </body>
             </html>
         </ClerkProvider>
